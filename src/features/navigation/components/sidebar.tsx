@@ -16,7 +16,7 @@ export const Sidebar = () => {
       }}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
-      className="h-screen bg-[#1C1C1C] border-r border-gray-800 flex flex-col py-4 transition-all duration-200"
+      className="fixed h-screen bg-[#1C1C1C] border-r border-gray-800 flex flex-col py-4 transition-all duration-200 z-50"
     >
       <div className="px-3 mb-8">
         <div className={`h-8 w-8 bg-[${themeConfig.colors.primary}] rounded flex items-center justify-center`}>
