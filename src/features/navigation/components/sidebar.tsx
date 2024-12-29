@@ -1,60 +1,44 @@
-import { motion } from 'framer-motion';
-import { navigationItems, bottomNavigationItems } from '../data/navigation';
-import { SidebarItem } from './sidebar-item';
-import { UserMenu } from './user-menu';
-import { useSidebarStore } from '../stores/use-sidebar-store';
-import { themeConfig } from '@/config/theme';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { cn } from '@/shared/utils';
+import { NavigationItem } from '@/shared/types/navigation';
+import { useNavigation } from '@/features/navigation/hooks/use-navigation';
 
-export const Sidebar = () => {
-  const { isExpanded, setIsExpanded } = useSidebarStore();
+interface SidebarProps {
+  isOpen: boolean;
+}
+
+export function Sidebar({ isOpen }: SidebarProps) {
+  const location = useLocation();
+  const { navigationItems } = useNavigation();
 
   return (
-    <motion.div
-      initial={false}
-      animate={{ 
-        width: isExpanded ? 240 : 64
-      }}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
-      className="fixed h-screen bg-[#1C1C1C] border-r border-gray-800 flex flex-col py-4 transition-all duration-200 z-50"
+    <aside
+      className={cn(
+        'fixed left-0 top-0 z-40 h-screen w-64 transform border-r border-border bg-bg transition-transform',
+        !isOpen && '-translate-x-full'
+      )}
     >
-      <div className="px-3 mb-8">
-        <div className={`h-8 w-8 bg-[${themeConfig.colors.primary}] rounded flex items-center justify-center`}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M22 12L3 22L13 12L3 2L22 12Z"
-              fill="currentColor"
-              className="text-black"
-            />
-          </svg>
-        </div>
-      </div>
-
-      <div className="flex-1 space-y-1 px-2">
-        {navigationItems.map((item) => (
-          <SidebarItem
-            key={item.id}
-            icon={item.icon}
-            label={item.label}
-            path={item.path}
-            isExpanded={isExpanded}
-          />
-        ))}
-      </div>
-
-      <div className="mt-4 space-y-1 px-2">
-        {bottomNavigationItems.map((item) => (
-          <SidebarItem
-            key={item.id}
-            icon={item.icon}
-            label={item.label}
-            path={item.path}
-            isExpanded={isExpanded}
-          />
-        ))}
-      </div>
-
-      <UserMenu isExpanded={isExpanded} />
-    </motion.div>
+      <nav className="h-full overflow-y-auto">
+        <ul className="space-y-2 p-4">
+          {navigationItems.map((item: NavigationItem) => (
+            <li key={item.path}>
+              <a
+                href={item.path}
+                className={cn(
+                  'flex items-center rounded-lg p-2 text-text-secondary hover:bg-hover-bg',
+                  location.pathname === item.path && 'bg-active-bg text-text-primary'
+                )}
+              >
+                {item.icon && (
+                  <span className="mr-3">{item.icon}</span>
+                )}
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
   );
-};
+}

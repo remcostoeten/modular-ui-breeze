@@ -1,36 +1,22 @@
-import { Bell, ChevronDown, HelpCircle } from "lucide-react";
-import { WorkspaceSwitcher } from "./workspace-switcher";
-import { TopBarIcons } from "./top-bar-icons";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Menu } from 'lucide-react';
 
-export const TopBar = () => {
+interface TopBarProps {
+  onMenuClick: () => void;
+}
+
+export function TopBar({ onMenuClick }: TopBarProps) {
   return (
-    <div className="h-14 border-b border-gray-800 bg-[#1C1C1C] flex items-center px-4 justify-between fixed top-0 right-0 left-16 z-40">
-      <div className="flex items-center gap-4">
-        <WorkspaceSwitcher />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Project</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/database">Database</BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
-      
-      <div className="flex items-center gap-4">
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="text-gray-400 border-gray-800 hover:bg-[#2A2A2A] hover:text-white text-xs px-3 py-1 h-7"
+    <header className="fixed top-0 left-0 right-0 h-16 bg-bg border-b border-border z-50">
+      <div className="flex items-center h-full px-4">
+        <button
+          onClick={onMenuClick}
+          className="p-2 hover:bg-hover-bg rounded-lg transition-colors"
+          aria-label="Toggle Menu"
         >
-          Feedback
-        </Button>
-        <TopBarIcons />
+          <Menu className="w-6 h-6 text-text-primary" />
+        </button>
       </div>
-    </div>
+    </header>
   );
-};
+}

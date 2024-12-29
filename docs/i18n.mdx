@@ -1,0 +1,309 @@
+# Internationalization (i18n)
+
+## Overview
+
+Our i18n system provides:
+- Multi-language support
+- Type-safe translations
+- Dynamic language switching
+- Nested translation keys
+- Parameter interpolation
+
+## Directory Structure
+
+```
+src/
+└── shared/
+    └── i18n/
+        ├── locales/           # Translation files
+        │   ├── en.ts         # English translations
+        │   └── fr.ts         # French translations
+        ├── types/            # Type definitions
+        │   └── index.ts
+        └── index.ts          # i18n configuration
+```
+
+## Translation Files
+
+### Basic Structure
+```typescript
+// locales/en.ts
+export const en = {
+    common: {
+        actions: {
+            save: 'Save',
+            cancel: 'Cancel',
+            delete: 'Delete'
+        },
+        errors: {
+            required: 'This field is required',
+            invalid: 'Invalid value'
+        }
+    },
+    features: {
+        settings: {
+            title: 'Settings',
+            description: 'Manage your project settings',
+            deleteProject: {
+                title: 'Delete Project',
+                warning: 'This action cannot be undone',
+                confirmPhrase: 'delete my project'
+            }
+        }
+    }
+}
+
+// types/index.ts
+export type TranslationKeys = typeof en
+```
+
+### Nested Keys
+```typescript
+// Accessing nested translations
+t('features.settings.deleteProject.title')
+// => "Delete Project"
+```
+
+## Translation Hook
+
+```typescript
+// hooks/use-translations.ts
+import { useI18nStore } from '@/stores/i18n.store'
+
+export function useTranslations() {
+    const { t, currentLocale, setLocale } = useI18nStore()
+
+    return {
+        t,
+        currentLocale,
+        setLocale
+    }
+}
+
+// Usage in components
+function DeleteProjectModal() {
+    const { t } = useTranslations()
+
+    return (
+        <Modal>
+            <h2>{t('features.settings.deleteProject.title')}</h2>
+            <p>{t('features.settings.deleteProject.warning')}</p>
+        </Modal>
+    )
+}
+```
+
+## Parameter Interpolation
+
+### Basic Parameters
+```typescript
+// Translation with parameters
+{
+    welcome: 'Welcome, {{name}}!',
+    items: 'You have {{count}} items'
+}
+
+// Usage
+t('welcome', { name: 'John' })
+// => "Welcome, John!"
+
+t('items', { count: 5 })
+// => "You have 5 items"
+```
+
+### Pluralization
+```typescript
+// Translation with plurals
+{
+    items: {
+        zero: 'No items',
+        one: 'One item',
+        other: '{{count}} items'
+    }
+}
+
+// Usage
+t('items', { count: 0 }) // => "No items"
+t('items', { count: 1 }) // => "One item"
+t('items', { count: 5 }) // => "5 items"
+```
+
+## Type Safety
+
+### Type Definitions
+```typescript
+// types/index.ts
+type RecursivePartial<T> = {
+    [P in keyof T]?: T[P] extends object
+        ? RecursivePartial<T[P]>
+        : T[P]
+}
+
+export interface Translation extends RecursivePartial<typeof en> {}
+
+// Strongly typed translation function
+type TranslationKey = keyof typeof en
+type TranslationParams = Record<string, string | number>
+
+export interface I18n {
+    t: (key: TranslationKey, params?: TranslationParams) => string
+    setLocale: (locale: string) => Promise<void>
+    currentLocale: string
+}
+```
+
+### Type-Safe Usage
+```typescript
+function Component() {
+    const { t } = useTranslations()
+
+    // TypeScript will catch invalid keys
+    t('features.settings.nonexistent') // Error
+
+    // Correct usage
+    t('features.settings.title') // OK
+}
+```
+
+## Dynamic Language Loading
+
+```typescript
+// i18n/loader.ts
+export async function loadTranslations(locale: string) {
+    try {
+        const module = await import(`./locales/${locale}`)
+        return module.default
+    } catch (error) {
+        console.error(`Failed to load translations for ${locale}`)
+        return null
+    }
+}
+
+// Usage
+async function switchLanguage(locale: string) {
+    const translations = await loadTranslations(locale)
+    if (translations) {
+        setLocale(locale)
+        setTranslations(translations)
+    }
+}
+```
+
+## Integration with Components
+
+### Form Labels
+```typescript
+function LoginForm() {
+    const { t } = useTranslations()
+
+    return (
+        <form>
+            <Input
+                label={t('auth.login.email')}
+                placeholder={t('auth.login.emailPlaceholder')}
+            />
+            <Input
+                label={t('auth.login.password')}
+                type="password"
+                placeholder={t('auth.login.passwordPlaceholder')}
+            />
+        </form>
+    )
+}
+```
+
+### Error Messages
+```typescript
+function ErrorDisplay({ error }: { error: AppError }) {
+    const { t } = useTranslations()
+
+    return (
+        <Alert variant="error">
+            {t(`errors.${error.code}`, {
+                field: error.field,
+                value: error.value
+            })}
+        </Alert>
+    )
+}
+```
+
+## Best Practices
+
+### 1. Key Organization
+- Use consistent naming
+- Group by feature
+- Keep nesting shallow
+- Document special parameters
+
+### 2. Translation Management
+```typescript
+// Validate translations at build time
+function validateTranslations(base: typeof en, compare: Translation) {
+    // Check for missing keys
+    // Check for invalid nesting
+    // Check for parameter consistency
+}
+```
+
+### 3. Performance
+```typescript
+// Memoize translations when needed
+function Component() {
+    const { t } = useTranslations()
+
+    const memoizedText = useMemo(() =>
+        t('some.long.computation', { value }),
+        [value]
+    )
+}
+```
+
+### 4. Testing
+```typescript
+describe('translations', () => {
+    it('interpolates parameters correctly', () => {
+        const { t } = useTranslations()
+
+        expect(t('welcome', { name: 'John' }))
+            .toBe('Welcome, John!')
+    })
+})
+```
+
+## Migration Guide
+
+### From Hardcoded Strings
+```typescript
+// Before
+function Component() {
+    return <h1>Welcome to Settings</h1>
+}
+
+// After
+function Component() {
+    const { t } = useTranslations()
+    return <h1>{t('features.settings.welcome')}</h1>
+}
+```
+
+### From Other i18n Libraries
+```typescript
+// Before (react-intl)
+import { FormattedMessage } from 'react-intl'
+
+function Component() {
+    return (
+        <FormattedMessage
+            id="welcome"
+            values={{ name }}
+        />
+    )
+}
+
+// After
+function Component() {
+    const { t } = useTranslations()
+    return <>{t('welcome', { name })}</>
+}
+```

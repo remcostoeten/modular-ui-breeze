@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useLocation } from 'react-router-dom';
+import { useRouter } from '@tanstack/react-router';
 import { AuthAside } from './auth-aside';
 import { StorageAside } from './storage-aside';
 
@@ -9,23 +9,20 @@ const pageAsideMap = {
   '/storage': StorageAside,
 } as const;
 
-export const AsideContainer = () => {
-  const location = useLocation();
-  const AsideComponent = pageAsideMap[location.pathname as keyof typeof pageAsideMap];
+interface AsideContainerProps {
+  children: React.ReactNode
+  className?: string
+}
 
-  if (!AsideComponent) return null;
-
+export function AsideContainer({ children, className }: AsideContainerProps) {
   return (
-    <motion.aside
-      initial={{ width: 0, opacity: 0 }}
-      animate={{ width: 320, opacity: 1 }}
-      exit={{ width: 0, opacity: 0 }}
+    <aside
       className={cn(
-        "h-screen bg-[#1C1C1C] border-l border-gray-800",
-        "fixed top-14 right-0 z-0"
+        "h-screen bg-bg border-l border-border",
+        className
       )}
     >
-      <AsideComponent />
-    </motion.aside>
-  );
-};
+      {children}
+    </aside>
+  )
+}

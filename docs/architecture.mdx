@@ -1,0 +1,146 @@
+# Project Architecture
+
+## Overview
+
+Our application follows a feature-first architecture with shared utilities and components. This structure enables:
+- Feature isolation
+- Code reusability
+- Clear separation of concerns
+- Easy maintenance and scalability
+
+## Directory Structure
+
+```
+src/
+├── features/           # Feature-specific code
+│   ├── settings/      # Each feature in its own directory
+│   │   ├── components/
+│   │   ├── services/
+│   │   └── pages/
+│   └── ...
+├── shared/            # Shared utilities and components
+│   ├── components/    # Reusable UI components
+│   ├── hooks/        # Custom React hooks
+│   ├── utils/        # Utility functions
+│   └── i18n/         # Internationalization
+└── pages/            # Page components and routing
+
+## Features
+
+Each feature is self-contained and includes:
+- Components specific to the feature
+- Feature-specific services and utilities
+- Pages that compose the feature
+- Mock services for development
+
+### Feature Structure
+```typescript
+features/
+└── settings/
+    ├── components/          # Feature-specific components
+    │   ├── settings-card.tsx
+    │   └── delete-modal.tsx
+    ├── services/           # API and business logic
+    │   ├── project-service.mock.ts
+    │   └── project-service.ts (future)
+    └── pages/             # Page components
+        └── settings-page.tsx
+```
+
+## Shared System
+
+The shared system contains reusable code across features:
+
+### Components
+- UI components (buttons, inputs, modals)
+- Layout components (containers, grids)
+- Custom components (tooltips, dropdowns)
+
+### Hooks
+- Utility hooks (useKeyboardShortcut)
+- Feature hooks (useAuth, useSettings)
+- Data hooks (useQuery, useMutation)
+
+### Utils
+- Error handling
+- Type utilities
+- Common functions
+
+## Mock System
+
+Our mock system simulates backend services during development:
+
+### Structure
+```typescript
+services/
+├── project-service.mock.ts   # Mock implementation
+└── project-service.ts        # Real implementation (future)
+```
+
+### Mock Features
+- Simulated network delays
+- Random failures for error testing
+- Type-safe responses
+- Consistent with real API structure
+
+### Migration Path
+When moving to real APIs:
+1. Keep the same interface as mocks
+2. Implement real service alongside mock
+3. Switch implementation in service exports
+4. Remove mock after testing
+
+## Error Handling
+
+Centralized error handling system:
+- Custom error types
+- Error logging and tracking
+- User-friendly error messages
+- Type-safe error handling
+
+## State Management
+
+Guidelines for state management:
+- Local state for UI components
+- Context for shared state
+- Service layer for API state
+- Clear data flow patterns
+
+## Best Practices
+
+1. **Feature Organization**
+   - Keep features isolated
+   - Share through interfaces
+   - Clear boundaries
+
+2. **Component Design**
+   - Small, focused components
+   - Clear props interface
+   - Consistent patterns
+
+3. **Code Style**
+   - TypeScript for type safety
+   - Consistent naming
+   - Clear documentation
+
+4. **Testing**
+   - Component testing
+   - Service testing
+   - Integration testing
+
+## Future Considerations
+
+1. **API Integration**
+   - Real API services
+   - Authentication
+   - Error handling
+
+2. **Performance**
+   - Code splitting
+   - Lazy loading
+   - Performance monitoring
+
+3. **Deployment**
+   - CI/CD pipeline
+   - Environment configuration
+   - Monitoring and logging

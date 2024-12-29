@@ -4,7 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/shared/components/ui/dropdown-menu";
 
 export const TopBarIcons = () => {
   return (
@@ -24,7 +24,7 @@ export const TopBarIcons = () => {
           <Bell className="h-5 w-5 text-gray-400" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-80">
-          <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-border">
             <h2 className="font-medium">Notifications</h2>
             <div className="flex gap-4 text-sm text-gray-400">
               <button className="hover:text-white">Inbox</button>

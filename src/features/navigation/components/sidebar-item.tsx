@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useRouter } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
-import { themeConfig } from '@/config/theme';
 
 interface SidebarItemProps {
   icon: LucideIcon;
@@ -12,12 +11,12 @@ interface SidebarItemProps {
 }
 
 export const SidebarItem = ({ icon: Icon, label, path, isExpanded }: SidebarItemProps) => {
-  const location = useLocation();
-  const isActive = location.pathname === path;
+  const router = useRouter();
+  const isActive = router.state.location.pathname === path;
 
   return (
     <Link
-      to={path}
+      to={path as string}
       className={cn(
         'flex items-center px-3 py-2 rounded-md transition-colors relative group',
         isActive ? 'bg-[#313131] text-white' : 'text-gray-400 hover:bg-[#2A2A2A] hover:text-white'
@@ -26,7 +25,7 @@ export const SidebarItem = ({ icon: Icon, label, path, isExpanded }: SidebarItem
       <Icon size={20} />
       <motion.span
         initial={false}
-        animate={{ 
+        animate={{
           opacity: isExpanded ? 1 : 0,
           width: isExpanded ? 'auto' : 0,
           marginLeft: isExpanded ? '12px' : 0

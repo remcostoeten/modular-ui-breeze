@@ -1,7 +1,7 @@
 import { Copy } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { SettingsCard } from "@/components/ui/settings-card"
-import { ActionButton, DestructiveButton, PrimaryButton } from "@/components/ui/button-variants"
+import { Input } from "@/shared/components/custom/"
+import { ActionButton, DestructiveButton, PrimaryButton } from "@/shared/components/custom/button-variants"
+import { SettingsCard } from "@/shared/components/ui/settings-card"
 
 const Settings = () => {
   const projectData = {
@@ -10,10 +10,8 @@ const Settings = () => {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <h1 className="text-3xl font-bold text-white mb-8">Project Settings</h1>
-      
-      <SettingsCard 
+    <div className="space-y-6">
+      <SettingsCard
         title="General settings"
         action={
           <div className="flex gap-2">
@@ -25,18 +23,18 @@ const Settings = () => {
         <div className="space-y-4">
           <div>
             <label className="text-sm text-gray-400 block mb-2">Project name</label>
-            <Input 
+            <Input
               value={projectData.name}
-              className="bg-[#1C1C1C] border-gray-800 text-white"
+              className="bg-bg border-border text-white"
             />
           </div>
           <div>
             <label className="text-sm text-gray-400 block mb-2">Project ID</label>
             <div className="flex gap-2">
-              <Input 
+              <Input
                 value={projectData.id}
                 readOnly
-                className="bg-[#1C1C1C] border-gray-800 text-white"
+                className="bg-bg border-border text-white"
               />
               <ActionButton>
                 <Copy className="w-4 h-4" />

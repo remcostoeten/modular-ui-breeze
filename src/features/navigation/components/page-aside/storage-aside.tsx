@@ -2,15 +2,15 @@ export const StorageAside = () => {
   return (
     <div className="p-4">
       <div className="space-y-4">
-        <button className="w-full text-left px-3 py-2 text-gray-400 hover:text-white border border-gray-800 rounded-md">
+        <button className="w-full text-left px-3 py-2 text-gray-400 hover:text-white border border-border rounded-md">
           + New bucket
         </button>
-        
+
         <div className="relative">
           <input
             type="text"
             placeholder="Search buckets..."
-            className="w-full bg-transparent border border-gray-800 rounded-md px-3 py-2 text-gray-400 focus:outline-none focus:border-gray-700"
+            className="w-full bg-transparent border border-border rounded-md px-3 py-2 text-gray-400 focus:outline-none focus:border-gray-700"
           />
         </div>
       </div>

@@ -1,0 +1,299 @@
+# Features System
+
+## Overview
+
+The features system organizes code by business domain rather than technical concerns. Each feature is a self-contained module that includes:
+- Components
+- Services
+- Pages
+- Types
+- Utils
+
+## Structure
+
+```
+features/
+└── feature-name/
+    ├── components/     # Feature-specific components
+    ├── services/      # API and business logic
+    ├── pages/         # Page components
+    ├── types/         # Type definitions
+    └── utils/         # Feature-specific utilities
+```
+
+## Feature Guidelines
+
+### 1. Feature Isolation
+
+Each feature should:
+- Be self-contained
+- Have clear boundaries
+- Minimize dependencies on other features
+- Share code through shared system
+
+```typescript
+// Good: Self-contained feature
+features/
+└── settings/
+    ├── components/
+    │   └── settings-card.tsx
+    └── pages/
+        └── settings-page.tsx
+
+// Bad: Feature depending on another feature
+features/
+└── settings/
+    └── pages/
+        └── settings-page.tsx
+            // Don't import from other features
+            import { UserCard } from '@/features/users'
+```
+
+### 2. Component Organization
+
+```typescript
+features/settings/
+├── components/
+│   ├── index.ts           # Public API
+│   ├── settings-card.tsx  # Main component
+│   └── internal/         # Private components
+│       └── card-header.tsx
+```
+
+### 3. Service Layer
+
+```typescript
+// services/project-service.ts
+export interface ProjectService {
+    getProject(id: string): Promise<Project>
+    updateProject(id: string, data: UpdateProjectData): Promise<Project>
+    deleteProject(id: string): Promise<void>
+}
+
+// Mock implementation during development
+export class ProjectServiceMock implements ProjectService {
+    // Implementation
+}
+
+// Real implementation
+export class ProjectServiceImpl implements ProjectService {
+    // Implementation
+}
+```
+
+## Feature Examples
+
+### Settings Feature
+
+```typescript
+features/settings/
+├── components/
+│   ├── settings-card.tsx
+│   └── delete-project-modal.tsx
+├── services/
+│   └── project-service.mock.ts
+├── pages/
+│   └── settings-page.tsx
+└── types/
+    └── index.ts
+```
+
+### Authentication Feature
+
+```typescript
+features/auth/
+├── components/
+│   ├── login-form.tsx
+│   └── signup-form.tsx
+├── services/
+│   └── auth-service.ts
+├── hooks/
+│   └── use-auth.ts
+└── pages/
+    ├── login-page.tsx
+    └── signup-page.tsx
+```
+
+## Communication Between Features
+
+### 1. Through Services
+
+```typescript
+// features/projects/services/project-service.ts
+export interface ProjectService {
+    getProject(id: string): Promise<Project>
+}
+
+// features/users/pages/user-page.tsx
+import { getProjectService } from '@/services'
+
+function UserPage() {
+    const projectService = getProjectService()
+    // Use project service
+}
+```
+
+### 2. Through Events
+
+```typescript
+// shared/events/event-bus.ts
+export const eventBus = {
+    emit: (event: string, data: unknown) => {},
+    on: (event: string, callback: (data: unknown) => void) => {},
+}
+
+// features/settings/pages/settings-page.tsx
+eventBus.emit('project:deleted', { id: projectId })
+
+// features/dashboard/pages/dashboard-page.tsx
+eventBus.on('project:deleted', (data) => {
+    // Handle project deletion
+})
+```
+
+## State Management
+
+### 1. Local State
+
+```typescript
+// Component-level state
+function SettingsCard() {
+    const [isOpen, setIsOpen] = useState(false)
+    // Use local state
+}
+```
+
+### 2. Feature State
+
+```typescript
+// Feature-level state
+export function useProjectSettings(projectId: string) {
+    const [settings, setSettings] = useState<ProjectSettings>()
+    // Manage feature state
+}
+```
+
+### 3. Shared State
+
+```typescript
+// Through context or state management
+export function useAuth() {
+    const [user, setUser] = useState<User>()
+    // Manage auth state
+}
+```
+
+## Best Practices
+
+### 1. Feature Organization
+
+- Group related functionality
+- Clear public API
+- Minimal cross-feature dependencies
+- Document boundaries
+
+### 2. Code Structure
+
+```typescript
+// Clear exports
+export { SettingsCard } from './components'
+export type { Settings } from './types'
+export { useSettings } from './hooks'
+```
+
+### 3. Documentation
+
+```typescript
+/**
+ * Settings feature
+ *
+ * This feature handles project settings management including:
+ * - General settings
+ * - Project deletion
+ * - Environment variables
+ */
+
+interface SettingsProps {
+    /** The project to manage settings for */
+    projectId: string
+}
+```
+
+## Migration Guidelines
+
+### 1. Creating New Features
+
+1. Plan feature structure
+2. Create feature directory
+3. Add necessary subdirectories
+4. Create public API
+5. Document feature
+
+### 2. Splitting Features
+
+1. Identify boundaries
+2. Create new feature
+3. Move relevant code
+4. Update imports
+5. Test functionality
+
+### 3. Combining Features
+
+1. Identify overlap
+2. Create new feature
+3. Merge functionality
+4. Update references
+5. Remove old features
+
+## Testing Strategy
+
+### 1. Component Tests
+
+```typescript
+// features/settings/components/__tests__/settings-card.test.tsx
+describe('SettingsCard', () => {
+    it('renders settings correctly', () => {
+        // Test implementation
+    })
+})
+```
+
+### 2. Integration Tests
+
+```typescript
+// features/settings/__tests__/settings.test.tsx
+describe('Settings Feature', () => {
+    it('allows updating project settings', () => {
+        // Test implementation
+    })
+})
+```
+
+## Performance Considerations
+
+### 1. Code Splitting
+
+```typescript
+// Lazy load feature
+const SettingsPage = lazy(() =>
+    import('@/features/settings/pages/settings-page')
+)
+```
+
+### 2. State Management
+
+```typescript
+// Optimize re-renders
+const settings = useMemo(() => ({
+    // Settings configuration
+}), [dependencies])
+```
+
+### 3. Data Loading
+
+```typescript
+// Efficient data fetching
+const { data, loading } = useQuery(SETTINGS_QUERY, {
+    variables: { projectId }
+})
+```

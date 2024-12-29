@@ -1,0 +1,286 @@
+# Shared System
+
+## Overview
+
+The shared system contains reusable code that's used across multiple features. It includes:
+- UI Components
+- Custom Hooks
+- Utilities
+- Type Definitions
+
+## Directory Structure
+
+```
+shared/
+├── components/           # Reusable UI components
+│   ├── custom/          # Custom components
+│   └── ui/             # Base UI components
+├── hooks/              # Custom React hooks
+├── utils/             # Utility functions
+├── types/             # Type definitions
+└── i18n/              # Internationalization
+```
+
+## Components
+
+### UI Components
+Base UI components that follow consistent patterns:
+
+```typescript
+// Button example
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    variant?: 'primary' | 'secondary' | 'destructive'
+    size?: 'sm' | 'md' | 'lg'
+}
+
+export const Button = ({
+    variant = 'primary',
+    size = 'md',
+    className,
+    ...props
+}: ButtonProps) => {
+    return (
+        <button
+            className={cn(
+                buttonVariants({ variant, size }),
+                className
+            )}
+            {...props}
+        />
+    )
+}
+```
+
+### Custom Components
+More complex components with specific functionality:
+
+```typescript
+// Modal example
+interface ModalProps {
+    isOpen: boolean
+    onClose: () => void
+    title?: string
+    children: React.ReactNode
+}
+
+export const Modal = ({
+    isOpen,
+    onClose,
+    title,
+    children
+}: ModalProps) => {
+    // Implementation
+}
+```
+
+## Hooks
+
+### Utility Hooks
+```typescript
+// Keyboard shortcut hook
+export function useKeyboardShortcut({
+    shortcut,
+    callback,
+    enabled = true
+}: KeyboardShortcutOptions) {
+    useEffect(() => {
+        if (!enabled) return
+        // Implementation
+    }, [shortcut, callback, enabled])
+}
+```
+
+### Data Hooks
+```typescript
+// API hook example
+export function useApi<T>(endpoint: string) {
+    const [data, setData] = useState<T>()
+    const [error, setError] = useState<Error>()
+    // Implementation
+}
+```
+
+## Utilities
+
+### Error Handling
+```typescript
+// Error handler
+export const handleError = (
+    error: unknown,
+    metadata?: ErrorMetadata
+): AppError => {
+    // Implementation
+}
+```
+
+### Type Utilities
+```typescript
+// Type utilities
+type DeepPartial<T> = {
+    [P in keyof T]?: T[P] extends object
+        ? DeepPartial<T[P]>
+        : T[P]
+}
+```
+
+## Best Practices
+
+### 1. Component Design
+
+- Keep components focused and single-purpose
+- Use TypeScript for prop types
+- Include proper documentation
+- Follow accessibility guidelines
+
+```typescript
+interface Props {
+    /** Description of the prop */
+    label: string
+    /** Optional description */
+    description?: string
+}
+```
+
+### 2. Hook Guidelines
+
+- Clear naming convention
+- Document dependencies
+- Handle cleanup properly
+- Consider performance
+
+```typescript
+function useCustomHook(deps: Deps) {
+    useEffect(() => {
+        // Setup
+        return () => {
+            // Cleanup
+        }
+    }, [deps])
+}
+```
+
+### 3. Utility Functions
+
+- Pure functions when possible
+- Proper error handling
+- Type safety
+- Documentation
+
+```typescript
+/**
+ * Formats a number as currency
+ * @param value The number to format
+ * @param currency The currency code
+ */
+function formatCurrency(value: number, currency = 'USD'): string {
+    // Implementation
+}
+```
+
+## Common Patterns
+
+### 1. Component Composition
+
+```typescript
+// Base component
+const Base = (props: BaseProps) => {
+    // Implementation
+}
+
+// Variants
+export const Primary = (props: BaseProps) => (
+    <Base variant="primary" {...props} />
+)
+
+export const Secondary = (props: BaseProps) => (
+    <Base variant="secondary" {...props} />
+)
+```
+
+### 2. Render Props
+
+```typescript
+interface RenderProps<T> {
+    data: T
+    render: (item: T) => React.ReactNode
+}
+
+function DataRenderer<T>({ data, render }: RenderProps<T>) {
+    return <>{render(data)}</>
+}
+```
+
+### 3. Compound Components
+
+```typescript
+interface TabsContext {
+    activeTab: string
+    setActiveTab: (tab: string) => void
+}
+
+const TabsContext = React.createContext<TabsContext | null>(null)
+
+export const Tabs = {
+    Root: ({ children }: { children: React.ReactNode }) => {
+        // Implementation
+    },
+    Tab: ({ id, children }: TabProps) => {
+        // Implementation
+    },
+    Panel: ({ id, children }: PanelProps) => {
+        // Implementation
+    }
+}
+```
+
+## Migration Guidelines
+
+When moving components to shared:
+
+1. **Identify Reuse**
+   - Used in multiple features
+   - Generic functionality
+   - Common UI patterns
+
+2. **Refactor Steps**
+   - Extract component
+   - Add proper types
+   - Add documentation
+   - Update imports
+
+3. **Testing**
+   - Add unit tests
+   - Test all variants
+   - Test edge cases
+
+## Documentation
+
+All shared code should include:
+
+1. **JSDoc Comments**
+```typescript
+/**
+ * Component description
+ * @param props - Props description
+ * @returns Component description
+ */
+```
+
+2. **Usage Examples**
+```typescript
+// Example usage:
+<Button
+    variant="primary"
+    onClick={() => console.log('clicked')}
+>
+    Click me
+</Button>
+```
+
+3. **Type Definitions**
+```typescript
+interface Props {
+    /** Description */
+    prop: string
+}
+```

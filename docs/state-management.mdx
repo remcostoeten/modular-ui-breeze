@@ -1,0 +1,268 @@
+# State Management with Zustand
+
+## Overview
+
+We use Zustand for global state management due to its:
+- Simplicity and minimal boilerplate
+- TypeScript support
+- React hooks integration
+- Performance optimizations
+
+## Basic Store Pattern
+
+```typescript
+// stores/settings.store.ts
+import { create } from 'zustand'
+
+interface SettingsState {
+    theme: 'light' | 'dark'
+    language: string
+    setTheme: (theme: 'light' | 'dark') => void
+    setLanguage: (lang: string) => void
+}
+
+export const useSettingsStore = create<SettingsState>((set) => ({
+    theme: 'dark',
+    language: 'en',
+    setTheme: (theme) => set({ theme }),
+    setLanguage: (language) => set({ language })
+}))
+```
+
+## Store Organization
+
+### Feature-Specific Stores
+```typescript
+// features/projects/stores/project.store.ts
+interface ProjectState {
+    currentProject: Project | null
+    projects: Project[]
+    setCurrentProject: (project: Project) => void
+    addProject: (project: Project) => void
+}
+
+export const useProjectStore = create<ProjectState>((set) => ({
+    currentProject: null,
+    projects: [],
+    setCurrentProject: (project) => set({ currentProject: project }),
+    addProject: (project) =>
+        set((state) => ({
+            projects: [...state.projects, project]
+        }))
+}))
+```
+
+### Shared Stores
+```typescript
+// stores/app.store.ts
+interface AppState {
+    isLoading: boolean
+    error: Error | null
+    setLoading: (loading: boolean) => void
+    setError: (error: Error | null) => void
+}
+
+export const useAppStore = create<AppState>((set) => ({
+    isLoading: false,
+    error: null,
+    setLoading: (isLoading) => set({ isLoading }),
+    setError: (error) => set({ error })
+}))
+```
+
+## Usage in Components
+
+```typescript
+function SettingsPage() {
+    const { theme, setTheme } = useSettingsStore()
+    const { currentProject } = useProjectStore()
+
+    return (
+        <div>
+            <ThemeToggle
+                value={theme}
+                onChange={setTheme}
+            />
+            {currentProject && (
+                <ProjectSettings project={currentProject} />
+            )}
+        </div>
+    )
+}
+```
+
+## Store Patterns
+
+### 1. Computed Values
+```typescript
+interface TodoState {
+    todos: Todo[]
+    // Computed value
+    completedTodos: () => Todo[]
+}
+
+const useTodoStore = create<TodoState>((set, get) => ({
+    todos: [],
+    completedTodos: () => get().todos.filter(t => t.completed)
+}))
+```
+
+### 2. Async Actions
+```typescript
+interface ProjectState {
+    projects: Project[]
+    fetchProjects: () => Promise<void>
+}
+
+const useProjectStore = create<ProjectState>((set) => ({
+    projects: [],
+    fetchProjects: async () => {
+        const projects = await projectService.getProjects()
+        set({ projects })
+    }
+}))
+```
+
+### 3. Store Slices
+```typescript
+const createAuthSlice = (set: any) => ({
+    user: null,
+    setUser: (user: User) => set({ user })
+})
+
+const createSettingsSlice = (set: any) => ({
+    theme: 'dark',
+    setTheme: (theme: string) => set({ theme })
+})
+
+// Combine slices
+const useStore = create((set, get) => ({
+    ...createAuthSlice(set),
+    ...createSettingsSlice(set)
+}))
+```
+
+## Integration with i18n
+
+```typescript
+// stores/i18n.store.ts
+interface I18nState {
+    currentLocale: string
+    translations: Record<string, any>
+    setLocale: (locale: string) => Promise<void>
+    t: (key: string, params?: Record<string, any>) => string
+}
+
+export const useI18nStore = create<I18nState>((set, get) => ({
+    currentLocale: 'en',
+    translations: {},
+    setLocale: async (locale) => {
+        const translations = await loadTranslations(locale)
+        set({ currentLocale: locale, translations })
+    },
+    t: (key, params) => {
+        const { translations } = get()
+        // Translation logic here
+        return translateKey(translations, key, params)
+    }
+}))
+
+// Usage in components
+function MyComponent() {
+    const { t, setLocale } = useI18nStore()
+
+    return (
+        <div>
+            <h1>{t('features.settings.title')}</h1>
+            <select onChange={(e) => setLocale(e.target.value)}>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+            </select>
+        </div>
+    )
+}
+```
+
+## Best Practices
+
+### 1. Store Organization
+- Keep stores small and focused
+- Split into feature-specific stores
+- Use slices for complex stores
+- Document store interfaces
+
+### 2. Performance
+```typescript
+// Selective updates
+function Component() {
+    // Only re-renders when theme changes
+    const theme = useSettingsStore(state => state.theme)
+
+    // Only re-renders when both values change
+    const { user, settings } = useAppStore(
+        state => ({
+            user: state.user,
+            settings: state.settings
+        }),
+        shallow
+    )
+}
+```
+
+### 3. TypeScript Integration
+```typescript
+// Strongly typed selectors
+const selectCompletedTodos = (state: TodoState) =>
+    state.todos.filter(t => t.completed)
+
+function CompletedList() {
+    const completed = useTodoStore(selectCompletedTodos)
+    return <TodoList items={completed} />
+}
+```
+
+### 4. Testing
+```typescript
+// Store testing
+describe('settingsStore', () => {
+    it('updates theme', () => {
+        const { result } = renderHook(() => useSettingsStore())
+
+        act(() => {
+            result.current.setTheme('light')
+        })
+
+        expect(result.current.theme).toBe('light')
+    })
+})
+```
+
+## Migration from Context
+
+If you're migrating from React Context:
+
+```typescript
+// Before (with Context)
+const ThemeContext = React.createContext<ThemeContextType>(null)
+
+function ThemeProvider({ children }) {
+    const [theme, setTheme] = useState('dark')
+    return (
+        <ThemeContext.Provider value={{ theme, setTheme }}>
+            {children}
+        </ThemeContext.Provider>
+    )
+}
+
+// After (with Zustand)
+const useThemeStore = create<ThemeState>((set) => ({
+    theme: 'dark',
+    setTheme: (theme) => set({ theme })
+}))
+
+// Usage remains similar
+function Component() {
+    const { theme, setTheme } = useThemeStore()
+    // Use theme and setTheme
+}
+```

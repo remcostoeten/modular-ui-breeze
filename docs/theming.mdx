@@ -1,0 +1,184 @@
+# Theming System
+
+## Overview
+
+The theming system provides a consistent way to manage colors and styles across the application. It supports multiple themes and is designed to be easily extensible.
+
+## Theme Structure
+
+Each theme must implement the `Theme` interface:
+
+```typescript
+interface Theme {
+  colors: {
+    primary: string;
+    background: {
+      dark: string;
+      darker: string;
+    };
+    text: {
+      primary: string;
+      secondary: string;
+    };
+    hover: {
+      background: string;
+    };
+    active: {
+      background: string;
+    };
+  };
+  transitions: {
+    sidebar: string;
+  };
+}
+```
+
+## Available Themes
+
+### Dark Theme (Default)
+The default dark theme with a modern, professional look:
+- Primary: `#3ECF8E` (Green)
+- Background: `#1C1C1C` (Dark Gray)
+- Text: `#FFFFFF` (White)
+
+### Catppuccin Mocha
+A popular theme known for its warm, pastel colors:
+- Primary: `#89B4FA` (Blue)
+- Background: `#1E1E2E` (Base)
+- Text: `#CDD6F4` (Text)
+
+## Usage
+
+### In Tailwind CSS
+
+Colors are mapped in `tailwind.config.js`:
+
+```javascript
+colors: {
+  bg: {
+    DEFAULT: themeConfig.colors.background.dark,
+    darker: themeConfig.colors.background.darker,
+  },
+  border: {
+    DEFAULT: themeConfig.colors.background.dark,
+    dark: themeConfig.colors.background.dark,
+    darker: themeConfig.colors.background.darker,
+  }
+}
+```
+
+Use these colors in your components:
+```tsx
+<div className="bg-bg border-border">
+  <h1 className="text-primary">Title</h1>
+</div>
+```
+
+### CSS Variables
+
+Theme colors are also available as CSS variables in `index.css`:
+
+```css
+:root {
+  --background: var(--theme-background);
+  --foreground: var(--theme-foreground);
+  /* ... other variables ... */
+}
+```
+
+## Adding a New Theme
+
+1. Create a new theme object that implements the `Theme` interface:
+
+```typescript
+export const myTheme: Theme = {
+  colors: {
+    primary: '#...',
+    background: {
+      dark: '#...',
+      darker: '#...',
+    },
+    // ... other colors
+  },
+  transitions: {
+    sidebar: 'width 0.2s ease-in-out',
+  }
+};
+```
+
+2. Add the theme to the `themes` object:
+
+```typescript
+export const themes = {
+  dark: darkTheme,
+  catppuccin: catppuccinTheme,
+  myTheme: myTheme,
+} as const;
+```
+
+## Theme Switching
+
+The theme can be switched at runtime using the theme store:
+
+```typescript
+import { useThemeStore } from '@/stores/theme.store';
+
+function ThemeSwitcher() {
+  const { setTheme } = useThemeStore();
+
+  return (
+    <select onChange={(e) => setTheme(e.target.value as ThemeType)}>
+      <option value="dark">Dark</option>
+      <option value="catppuccin">Catppuccin</option>
+    </select>
+  );
+}
+```
+
+## Best Practices
+
+1. **Use Theme Variables**: Always use theme variables instead of hardcoding colors
+2. **Semantic Names**: Use semantic color names (e.g., `primary`, `background`) rather than specific color names
+3. **Consistent Structure**: Follow the theme interface structure when adding new themes
+4. **Documentation**: Document any special considerations for new themes
+5. **Testing**: Test themes across different components to ensure consistent appearance
+
+## CSS Custom Properties
+
+The theming system uses CSS custom properties for dynamic theme switching:
+
+```css
+/* Light theme */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  /* ... other variables ... */
+}
+
+/* Dark theme */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  /* ... other variables ... */
+}
+```
+
+## Component Example
+
+Here's how to create a themed component:
+
+```tsx
+function ThemedCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="
+      bg-bg
+      border-border
+      hover:bg-hover-background
+      active:bg-active-background
+      text-text-primary
+    ">
+      {children}
+    </div>
+  );
+}
+```

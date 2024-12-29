@@ -1,0 +1,225 @@
+# Mock System
+
+## Overview
+
+Our mock system provides development-time implementations of backend services. It's designed to:
+- Simulate real API behavior
+- Provide type-safe responses
+- Handle error cases
+- Make testing easier
+
+## Structure
+
+```typescript
+features/
+└── feature-name/
+    └── services/
+        ├── service.mock.ts     # Mock implementation
+        └── service.ts          # Real implementation (future)
+```
+
+## Mock Implementation Pattern
+
+### Basic Pattern
+```typescript
+// Mock service class
+class ServiceMockBase {
+    async someMethod(): Promise<Result> {
+        await simulateNetworkDelay()
+        if (shouldSimulateError()) {
+            throw new ServiceError(...)
+        }
+        return mockData
+    }
+}
+
+// Wrap with error handling
+export const ServiceMock = {
+    someMethod: withErrorHandling(
+        new ServiceMockBase().someMethod,
+        { service: "ServiceName" }
+    )
+}
+```
+
+### Network Simulation
+```typescript
+// Simulate network delay
+const delay = (ms: number) => new Promise(
+    resolve => setTimeout(resolve, ms)
+)
+
+// Random delay between 1-2 seconds
+await delay(1000 + Math.random() * 1000)
+```
+
+### Error Simulation
+```typescript
+// 20% chance of failure
+const shouldFail = () => Math.random() < 0.2
+
+if (shouldFail()) {
+    throw new ServiceError(
+        "Operation failed",
+        ErrorCode.OPERATION_FAILED
+    )
+}
+```
+
+## Example Mock Service
+
+```typescript
+// project-service.mock.ts
+class ProjectServiceMockBase {
+    async deleteProject(id: string): Promise<void> {
+        await delay(1000 + Math.random() * 1000)
+
+        if (shouldFail()) {
+            throw new ProjectError(
+                "Failed to delete project",
+                ErrorCode.PROJECT_DELETE_FAILED
+            )
+        }
+
+        console.log(`[MOCK] Project ${id} deleted`)
+    }
+}
+
+export const ProjectServiceMock = {
+    deleteProject: withErrorHandling(
+        new ProjectServiceMockBase().deleteProject,
+        { service: "ProjectService" }
+    )
+}
+```
+
+## Migration to Real Implementation
+
+### Step 1: Create Real Service
+```typescript
+// project-service.ts
+export class ProjectService {
+    async deleteProject(id: string): Promise<void> {
+        const response = await fetch(`/api/projects/${id}`, {
+            method: 'DELETE'
+        })
+        if (!response.ok) {
+            throw new ProjectError(...)
+        }
+    }
+}
+```
+
+### Step 2: Create Service Factory
+```typescript
+// service-factory.ts
+const USE_MOCKS = process.env.USE_MOCKS === 'true'
+
+export const getProjectService = () => {
+    return USE_MOCKS ? ProjectServiceMock : new ProjectService()
+}
+```
+
+### Step 3: Update Imports
+```typescript
+// In components
+import { getProjectService } from '@/services/service-factory'
+
+const projectService = getProjectService()
+await projectService.deleteProject(id)
+```
+
+## Mock Data Guidelines
+
+1. **Realistic Data**
+   ```typescript
+   const mockProject = {
+       id: "proj_123",
+       name: "Example Project",
+       createdAt: new Date().toISOString()
+   }
+   ```
+
+2. **Type Safety**
+   ```typescript
+   interface Project {
+       id: string
+       name: string
+       createdAt: string
+   }
+
+   const mockProjects: Project[] = [...]
+   ```
+
+3. **Error States**
+   ```typescript
+   if (id.startsWith("invalid_")) {
+       throw new NotFoundError("Project")
+   }
+   ```
+
+## Best Practices
+
+1. **Mock Service Design**
+   - Match real API behavior
+   - Include realistic delays
+   - Handle all error cases
+   - Use proper typing
+
+2. **Error Handling**
+   - Use custom error types
+   - Simulate different errors
+   - Include error metadata
+   - Log errors properly
+
+3. **Data Generation**
+   - Use realistic data formats
+   - Include edge cases
+   - Maintain referential integrity
+   - Document data patterns
+
+4. **Migration Ready**
+   - Keep interfaces stable
+   - Document assumptions
+   - Use environment flags
+   - Plan migration steps
+
+## Common Patterns
+
+### Pagination
+```typescript
+async function listProjects(page: number, limit: number) {
+    const start = (page - 1) * limit
+    const items = mockProjects.slice(start, start + limit)
+    return {
+        items,
+        total: mockProjects.length,
+        page,
+        limit
+    }
+}
+```
+
+### Search/Filter
+```typescript
+async function searchProjects(query: string) {
+    return mockProjects.filter(p =>
+        p.name.toLowerCase().includes(query.toLowerCase())
+    )
+}
+```
+
+### Relations
+```typescript
+async function getProjectWithUsers(id: string) {
+    const project = mockProjects.find(p => p.id === id)
+    if (!project) throw new NotFoundError("Project")
+
+    return {
+        ...project,
+        users: mockUsers.filter(u =>
+            u.projectIds.includes(id)
+        )
+    }
+}
+```

@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/shared/components/ui/dropdown-menu";
 import { useWorkspaceStore } from "../stores/use-workspace-store";
 
 export const WorkspaceSwitcher = () => {
@@ -22,7 +22,7 @@ export const WorkspaceSwitcher = () => {
           <input
             type="text"
             placeholder="Search organization..."
-            className="w-full px-2 py-1 text-sm bg-transparent border border-gray-800 rounded focus:outline-none focus:border-gray-700"
+            className="w-full px-2 py-1 text-sm bg-transparent border border-border rounded focus:outline-none focus:border-gray-700"
           />
         </div>
         <DropdownMenuSeparator />
