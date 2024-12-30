@@ -18,11 +18,20 @@ export const SidebarItem = ({ icon: Icon, label, path, isExpanded }: SidebarItem
     <Link
       to={path}
       className={cn(
-        'flex items-center px-3 py-2 rounded-md transition-colors relative group',
+        'flex items-center px-3 py-2 rounded-md transition-colors relative group min-h-[44px]',
         isActive ? 'bg-[#313131] text-white' : 'text-gray-400 hover:bg-[#2A2A2A] hover:text-white'
       )}
     >
-      <Icon size={24} /> {/* Increased icon size from 20 to 24 */}
+      <div className={cn(
+        "flex items-center justify-center",
+        !isExpanded && "w-full"
+      )}>
+        <Icon size={20} className={cn(
+          "transition-all",
+          !isExpanded && "w-5 h-5"
+        )} />
+      </div>
+      
       <motion.span
         initial={false}
         animate={{ 
@@ -34,6 +43,7 @@ export const SidebarItem = ({ icon: Icon, label, path, isExpanded }: SidebarItem
       >
         {label}
       </motion.span>
+      
       {!isExpanded && (
         <motion.div
           initial={{ opacity: 0, x: -20 }}
