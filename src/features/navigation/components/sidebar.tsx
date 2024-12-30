@@ -12,7 +12,7 @@ export const Sidebar = () => {
     <motion.div
       initial={false}
       animate={{ 
-        width: isExpanded ? 240 : 56 // Adjusted from 64 to 56 for better proportions
+        width: isExpanded ? 240 : 64
       }}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { themeConfig } from '@/config/theme';
 
 interface SidebarItemProps {
   icon: LucideIcon;
@@ -18,20 +19,11 @@ export const SidebarItem = ({ icon: Icon, label, path, isExpanded }: SidebarItem
     <Link
       to={path}
       className={cn(
-        'flex items-center px-3 py-2 rounded-md transition-colors relative group min-h-[44px]',
+        'flex items-center px-3 py-2 rounded-md transition-colors relative group',
         isActive ? 'bg-[#313131] text-white' : 'text-gray-400 hover:bg-[#2A2A2A] hover:text-white'
       )}
     >
-      <div className={cn(
-        "flex items-center justify-center",
-        !isExpanded && "w-full"
-      )}>
-        <Icon size={20} className={cn(
-          "transition-all",
-          !isExpanded && "w-5 h-5"
-        )} />
-      </div>
-      
+      <Icon size={20} />
       <motion.span
         initial={false}
         animate={{ 
@@ -43,13 +35,12 @@ export const SidebarItem = ({ icon: Icon, label, path, isExpanded }: SidebarItem
       >
         {label}
       </motion.span>
-      
       {!isExpanded && (
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 0 }}
           whileHover={{ opacity: 1, x: 0 }}
-          className="fixed left-16 bg-[#1C1C1C] text-white px-2 py-1 rounded ml-2 whitespace-nowrap z-50"
+          className="fixed left-16 bg-gray-900 text-white px-2 py-1 rounded ml-2 whitespace-nowrap z-50"
         >
           {label}
         </motion.div>
