@@ -13,24 +13,24 @@ export const WorkspaceSwitcher = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[#2A2A2A] transition-colors">
-        <span className="text-sm text-white">{currentWorkspace}</span>
+      <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#2A2A2A] hover:bg-[#313131] transition-colors border border-gray-800">
+        <span className="text-sm font-medium text-white">{currentWorkspace}</span>
         <ChevronDown className="h-4 w-4 text-gray-400" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className="w-56 bg-[#1C1C1C] border-gray-800">
         <div className="px-2 py-1.5">
           <input
             type="text"
             placeholder="Search organization..."
-            className="w-full px-2 py-1 text-sm bg-transparent border border-gray-800 rounded focus:outline-none focus:border-gray-700"
+            className="w-full px-2 py-1 text-sm bg-[#2A2A2A] border border-gray-800 rounded focus:outline-none focus:ring-1 focus:ring-gray-700 text-white placeholder-gray-400"
           />
         </div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuSeparator className="bg-gray-800" />
+        <DropdownMenuItem className="text-gray-300 hover:bg-[#2A2A2A] focus:bg-[#2A2A2A] cursor-pointer">
           remcostoeten's Org
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuSeparator className="bg-gray-800" />
+        <DropdownMenuItem className="text-gray-300 hover:bg-[#2A2A2A] focus:bg-[#2A2A2A] cursor-pointer">
           <span className="flex items-center gap-2">
             <span className="text-primary">+</span>
             New organization

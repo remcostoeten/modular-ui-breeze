@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { themeConfig } from '@/config/theme';
 
 interface SidebarItemProps {
   icon: LucideIcon;
@@ -23,7 +22,7 @@ export const SidebarItem = ({ icon: Icon, label, path, isExpanded }: SidebarItem
         isActive ? 'bg-[#313131] text-white' : 'text-gray-400 hover:bg-[#2A2A2A] hover:text-white'
       )}
     >
-      <Icon size={20} />
+      <Icon size={24} /> {/* Increased icon size from 20 to 24 */}
       <motion.span
         initial={false}
         animate={{ 
@@ -40,7 +39,7 @@ export const SidebarItem = ({ icon: Icon, label, path, isExpanded }: SidebarItem
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 0 }}
           whileHover={{ opacity: 1, x: 0 }}
-          className="fixed left-16 bg-gray-900 text-white px-2 py-1 rounded ml-2 whitespace-nowrap z-50"
+          className="fixed left-16 bg-[#1C1C1C] text-white px-2 py-1 rounded ml-2 whitespace-nowrap z-50"
         >
           {label}
         </motion.div>

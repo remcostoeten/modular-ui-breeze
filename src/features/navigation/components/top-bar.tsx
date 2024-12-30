@@ -12,10 +12,14 @@ export const TopBar = () => {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/">Project</BreadcrumbLink>
+              <BreadcrumbLink href="/" className="text-gray-400 hover:text-white transition-colors">
+                Project
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/database">Database</BreadcrumbLink>
+              <BreadcrumbLink href="/database" className="text-gray-400 hover:text-white transition-colors">
+                Database
+              </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -25,7 +29,7 @@ export const TopBar = () => {
         <Button 
           variant="outline" 
           size="sm"
-          className="text-gray-400 border-gray-800 hover:bg-[#2A2A2A] hover:text-white text-xs px-3 py-1 h-7"
+          className="text-gray-400 border-gray-800 hover:bg-[#2A2A2A] hover:text-white text-xs px-3 py-1 h-7 rounded-full"
         >
           Feedback
         </Button>
